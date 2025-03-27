@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fruitables/view/cart/cart.dart';
 import 'package:fruitables/view/home/home_screen.dart';
 import 'package:fruitables/view/more/more_screen.dart';
 
@@ -15,7 +16,7 @@ class _DashboardState extends State<Dashboard> {
    
    final List<Widget> _pages = [
     const HomeScreen(),
-    const Placeholder(), 
+     const CartScreen(), 
     const MoreScreen(), 
   ];
 

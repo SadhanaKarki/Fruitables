@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fruitables/view/home/widget/exotic_tabbar.dart';
 import 'package:fruitables/view/home/widget/fruits_tabbar.dart';
 import 'package:fruitables/view/home/widget/vegetables_tabbar.dart';
+import 'package:fruitables/view/wishlist/wishlist_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,7 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      final screenSize = MediaQuery.of(context).size;
-   final screenWidth = screenSize.width;
+  // final screenWidth = screenSize.width;
    final screenHeight = screenSize.height;
     return DefaultTabController(
       length: 3,
@@ -18,8 +19,11 @@ class HomeScreen extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Text("Home",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
+              automaticallyImplyLeading: false,
             actions: [
-              IconButton(onPressed: (){}, icon: Icon(Icons.favorite_border_outlined,color: Colors.grey[900],)),
+              IconButton(onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => WishlistScreen(),));
+              }, icon: Icon(Icons.favorite_border_outlined,color: Colors.grey[900],)),
               IconButton(onPressed: (){}, icon: Icon(Icons.notifications_active_outlined,color: Colors.grey[900],))
             ],
           ),

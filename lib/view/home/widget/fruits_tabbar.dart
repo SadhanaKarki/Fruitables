@@ -1,13 +1,19 @@
 
 import 'package:flutter/material.dart';
+import 'package:fruitables/model/product_list.dart';
 import 'package:fruitables/model/product_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fruitables/view_model/cart/cart_provider.dart';
+import 'package:fruitables/view_model/wishlist/wishlist_provider.dart';
+import 'package:provider/provider.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
 class FruitsTabbar extends StatelessWidget {
   const FruitsTabbar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    List<Product> fruitProducts =
+        productList.where((product) => product.category == "fruit").toList();
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, 
@@ -15,64 +21,32 @@ class FruitsTabbar extends StatelessWidget {
         mainAxisSpacing: 15, 
         childAspectRatio: 1.9 / 2.4, 
       ),
-      itemCount: fruitList.length, 
+      itemCount: fruitProducts.length, 
       itemBuilder: (context, index) {
-        return CardSample(fruit: fruitList[index]);
+        return CardSample(product: fruitProducts[index]);
       },
     );
   }
 }
 
 class CardSample extends StatefulWidget {
-  final Fruit fruit;
+  final Product product;
 
-  const CardSample({super.key, required this.fruit});
+  const CardSample({super.key, required this.product});
 
   @override
   State<CardSample> createState() => _CardSampleState();
 }
 
 class _CardSampleState extends State<CardSample> {
-  bool isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Check if the current product is in the list of favorite products
-    loadFavoriteStatus();
-  }
-
-  Future<void> loadFavoriteStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final favoriteProducts = prefs.getStringList('favorite_products') ?? [];
-
-    setState(() {
-      isFavorite = favoriteProducts.contains(widget.fruit.id);
-    });
-  }
-
-  Future<void> toggleFavorite() async {
-    final prefs = await SharedPreferences.getInstance();
-    final favoriteProducts = prefs.getStringList('favorite_products') ?? [];
-
-    if (isFavorite) {
-      // Remove the product from the favorites
-      favoriteProducts.remove(widget.fruit.id);
-    } else {
-      // Add the product to the favorites
-      favoriteProducts.add(widget.fruit.id);
-    }
-
-    // Save the updated list of favorite products
-    await prefs.setStringList('favorite_products', favoriteProducts);
-
-    setState(() {
-      isFavorite = !isFavorite;
-    });
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
+    var wishlistProvider = Provider.of<WishlistProvider>(context);
+     var cartProvider = Provider.of<CartProvider>(context);
+    //bool isInCart = cartProvider.isInCart(widget.product);
+     int quantity = cartProvider.getQuantity(widget.product);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       child: SizedBox(
@@ -84,7 +58,7 @@ class _CardSampleState extends State<CardSample> {
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: Image.asset(
-                widget.fruit.imagePath,
+                widget.product.imagePath,
                 fit: BoxFit.cover,
                 width: 200,
                 height: 145,
@@ -92,12 +66,16 @@ class _CardSampleState extends State<CardSample> {
             ),
 
             Positioned(
-              bottom: 2,
-              right: 35,
+              top: 0,
+              right: 0,
               child: IconButton(
-                onPressed: toggleFavorite,
+                onPressed: () {
+                  wishlistProvider.toggleWishlist(widget.product);
+                },
                 icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                 wishlistProvider.isInWishlist(widget.product.id)
+                      ? Icons.favorite
+                      : Icons.favorite_border,
                   size: 25,
                   color: Colors.red,
                 ),
@@ -108,7 +86,7 @@ class _CardSampleState extends State<CardSample> {
               left: 10,
               bottom: 40,
               child: Text(
-                widget.fruit.name,
+                widget.product.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 17,
@@ -121,7 +99,7 @@ class _CardSampleState extends State<CardSample> {
               left: 10,
               bottom: 7,
               child: Text(
-                widget.fruit.price,
+                widget.product.price,
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -129,16 +107,24 @@ class _CardSampleState extends State<CardSample> {
             Positioned(
               bottom: 0,
               right: 0,
-              child: IconButton(
-                onPressed: () {
-                  setState(() {});
-                },
-                icon: Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 25,
-                  color: const Color.fromARGB(255, 86, 84, 84),
-                ),
-              ),
+              child:  quantity > 0
+                ? Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => cartProvider.removeFromCart(widget.product),
+                        icon: Icon(Icons.remove, color: Colors.red),
+                      ),
+                      Text('$quantity', style: TextStyle(fontWeight: FontWeight.bold)),
+                      IconButton(
+                        onPressed: () => cartProvider.addToCart(widget.product),
+                        icon: Icon(Icons.add, color: Colors.green),
+                      ),
+                    ],
+                  )
+                : IconButton(
+                    onPressed: () => cartProvider.addToCart(widget.product),
+                    icon: Icon(Icons.shopping_cart_outlined, size: 25, color: Colors.grey),
+                  ),
             ),
           ],
         ),
