@@ -9,6 +9,9 @@ class PrivacyPolicy extends StatelessWidget {
       appBar: AppBar(
         title: Text("Privacy Policy"),
       ),
+      body: SingleChildScrollView(
+        
+      ),
     );
   }
 }
