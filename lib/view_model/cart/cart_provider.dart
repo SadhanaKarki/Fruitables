@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../model/product_model.dart';
 
 class CartProvider with ChangeNotifier {
-  final Map<Product, int> _cartItems = {}; // Store full Product object with quantity
+  final Map<Product, int> _cartItems = {}; 
 
   Map<Product, int> get cartItems => _cartItems;
 

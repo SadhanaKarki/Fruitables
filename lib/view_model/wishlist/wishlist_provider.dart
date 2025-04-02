@@ -6,7 +6,7 @@ class WishlistProvider extends ChangeNotifier {
 
   List<Product> get wishlistItems => _wishlistItems;
 
-  /// ✅ Toggle Wishlist
+  
   void toggleWishlist(Product product) {
     if (_wishlistItems.any((item) => item.id == product.id)) {
       _wishlistItems.removeWhere((item) => item.id == product.id);
@@ -16,7 +16,7 @@ class WishlistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// ✅ Check if product is in wishlist
+  
   bool isInWishlist(String productId) {
     return _wishlistItems.any((product) => product.id == productId);
   }
